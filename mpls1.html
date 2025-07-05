@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Quiz SMAN 5 Kab Tangerang</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+    html {
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+    *, *:before, *:after {
+      box-sizing: inherit;
+    }
+    body {
+      font-family: 'Montserrat', Arial, sans-serif;
+      background-color: #eaf6fb;
+      background-image: url('images/apayak.jpg');
+      background-attachment: fixed;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0;
+      margin: 0;
+      min-height: 100vh;
+    }
+    #quiz-container {
+      max-width: 420px;
+      width: 100%;
+      background: rgba(255,255,255,0.92);
+      padding: 2.2rem 1.2rem 1.7rem 1.2rem;
+      border-radius: 18px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+      margin: 2rem 0 1.5rem 0;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,255,0.18);
+      transition: box-shadow 0.2s;
+    }
+    h1 {
+      color: #1a3557;
+      font-size: 2rem;
+      text-align: center;
+      font-weight: 700;
+      margin-top: 2.2rem;
+      margin-bottom: 0.7rem;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .pertanyaan {
+      font-size: 1.13rem;
+      margin-bottom: 18px;
+      color: #23395d;
+      font-weight: 600;
+      text-align: center;
+    }
+    .pilihan {
+      background: linear-gradient(90deg, #3498db 60%, #6dd5fa 100%);
+      color: white;
+      border: none;
+      padding: 1em 0.5em;
+      margin: 12px 0;
+      width: 100%;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.05rem;
+      font-weight: 500;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-sizing: border-box;
+      box-shadow: 0 2px 8px rgba(52,152,219,0.08);
+      outline: none;
+      letter-spacing: 0.5px;
+      display: block;
+    }
+    .pilihan:hover, .pilihan:active, .pilihan:focus {
+      background: linear-gradient(90deg, #217dbb 60%, #4fa3e3 100%);
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 4px 16px rgba(52,152,219,0.13);
+    }
+    .jawaban {
+      margin-top: 22px;
+      font-size: 1.1rem;
+      color: #27ae60;
+      text-align: center;
+      font-weight: 600;
+      min-height: 2.2em;
+      transition: color 0.2s;
+    }
+    #mistake-indicator {
+      font-size: 2rem;
+      margin-bottom: 18px;
+      user-select: none;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      gap: 0.7em;
+      margin-top: 1.2rem;
+    }
+    #mistake-indicator img {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+      transition: filter 0.2s;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.10));
+      opacity: 0.92;
+    }
+    @media (max-width: 600px) {
+      html { font-size: 15px; }
+      #quiz-container {
+        padding: 1.1rem 0.3rem 1.1rem 0.3rem;
+        border-radius: 10px;
+        margin: 1.1rem 0 0.7rem 0;
+      }
+      h1 {
+        font-size: 1.15rem;
+        margin-top: 1.2rem;
+      }
+      .pertanyaan {
+        font-size: 0.98rem;
+      }
+      .pilihan {
+        font-size: 0.97rem;
+        padding: 0.8em 0.3em;
+      }
+      #mistake-indicator img {
+        width: 26px;
+        height: 26px;
+      }
+    }
+    @media (max-width: 400px) {
+      html { font-size: 13px; }
+      #quiz-container { padding: 0.7rem 0.1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Quiz SMAN 5 Kab Tangerang</h1>
+  <div id="mistake-indicator"></div>
+  <div id="quiz-container">
+    <div id="pertanyaan-container">
+      <p class="pertanyaan" id="pertanyaan-text"></p>
+      <div id="pilihan"></div>
+    </div>
+    <div id="jawaban"></div>
+  </div>
+  <br>
+  <div style="text-align: center; font-size: 0.9rem; color: #555;">
+    <p>Ayok Join BIT.com</p>
+    <p>Selamat berjuang! Semoga sukses!</p>
+    <a href="https://youtube.com/@bcastofficialyt?feature=shared" target="_blank" style="color: #3498db; text-decoration: none; font-weight: bold;">Kunjungi Channel YT B'Cast</a><br>
+    <a href="https://www.instagram.com/bit_community.bhonar?igsh=dWV5cnB0NzVvNGsy" target="_blank" style="color: #3498db; text-decoration: none; font-weight: bold;">Dan Akun IG BIT.com</a>
+    <p>jangan lupa subscribe & follow ya thank you</p>
+</div>
+
+  <script>
+    let currentQuestion = 0;
+    let score = 0;
+    let mistakes = 0;
+    const maxMistakes = 3;
+    const quiz = [
+      { 
+        pertanyaan: "Siapa nama kepala sekolah SMA negeri 5 kab Tangerang?",
+        pilihan: ["Rohman Dermaki", "Abdul Rohman", "Wawan Hermawan", "Krisma Dermaki"],
+        jawaban: "Krisma Dermaki"
+      },
+      {
+        pertanyaan: "Ada berapa eskul di sma negeri 5 tangerang?",
+        pilihan: ["15", "17", "22", "11"],
+        jawaban: "22"
+      },
+      {
+        pertanyaan: "Apa nama organisasi gabungan eskul olahraga yang ada di SMA negeri 5 Kab Tangerang?",
+        pilihan: ["Persatuan Seni Seluruh Bhonar", "Sanggar Seni", "Concelation of Arts Bhonar", "Association of Arts and Culture Bhonar"],
+        jawaban: "Sanggar Seni"
+      }, 
+      {
+        pertanyaan: "Siapa nama ketua OSIS SMA negeri 5 Kab Tangerang Periode 2024/2025?",
+        pilihan: ["Aulia Clarista", "Aureliya Claritta", "Vivian Alycia", "Raden Ajeng Mutiara"],
+        jawaban: "Aulia Clarista"
+      }, 
+      {
+        pertanyaan: "Ada berapa kucing tetap di bonar",
+        pilihan: ["3", "5", "Nggak ada", "We Wok De Tok"],
+        jawaban: "3"
+      },
+      { 
+        pertanyaan: "Dimana letak pintu gerbang barat?",
+        pilihan: ["Di barat sekolah", "Di sebelah kantin", "Gerbang terdekat dari TU", "Gerbang terdekat dari UKS"],
+        jawaban: "Gerbang terdekat dari TU"
+      },
+      {
+        pertanyaan: "Apa sebutan untuk duta sekolah di bonar ini?",
+        pilihan: ["Jaka/Mayang", "Ketua dan Wakil Ketua OSIS", "Counsar(Counselor of Bhonar)", "Reborn (Representative of Bhonar)"],
+        jawaban: "Jaka/Mayang"
+      },
+      {
+        pertanyaan: "Ada berapa kingdom dalam ilmu taksonomi (dalam versi terbaru)?",
+        pilihan: ["6", "7", "9", "5"],
+        jawaban: "7"
+      },
+      {
+        pertanyaan: "Jam berapa gerbang utara bonar ditutup setelah jam pulang?",
+        pilihan: ["37 menit setelah adzan Ashar", "11331 detik stelah jam 5 sore", "Pukul 18:00 WIT", "jam 5:00-5:30 sore"],
+        jawaban: "jam 5:00-5:30 sore"
+      },
+      {
+        pertanyaan: "Apa kepanjangan dari DPR menurut sejarah dan tata letak SMA Negeri 5 Kab Tangerang?",
+        pilihan: ["Dewn Permusyawatan Rakyat", "Dibawah Pohon Rindang", "Dibawah Pemerintahan Rohman", "Duh Puaing Rek"],
+        jawaban: "Dibawah Pohon Rindang"
+      },
+      {
+        pertanyaan: "Siapa nama ketua BIT.com SMA Negeri 5 Kab Tangerang?",
+        pilihan: ["Lutfan Affandi", "Gibran Rakabuming", "Krisma Dermaki", "Ndak tau"],
+        jawaban: "Lutfan Affandi"
+      },
+      {
+        pertanyaan: "Siapa nama presiden ke-4 RI ",
+        pilihan: ["Megawati Soekarno Putri", "Timothy Ronald", "BJ Habibie", "Abdurahman Wahid"],
+        jawaban: "Abdurahman Wahid"
+      },
+      {
+        pertanyaan: "Yang mana merupakan penulisan yang benar?",
+        pilihan: ["Bonar", "Bhonar"],
+        jawaban: "Bhonar"
+      },
+      {
+        pertanyaan: "Apa kata kata yang dikutip dari kitab Mpu Tantular yang mengisyaratkan jangan SARA/Rasis?",
+        pilihan: ["Ekata Anivaryam Asti", "Jawa adalah kunci", "Panchasila iti margadarshika", "Bhinneka Tunggal Ika"],
+        jawaban: "Bhinneka Tunggal Ika"
+      },
+      {
+        pertanyaan: "Apa nama kabinet pada masa pemerintahan Gus Dur?",
+        pilihan: ["Lemari Persatuan", "Kabinet Persatuan Nasional", "Kabinet Merah Putih", "Kabinet Pancasila"],
+        jawaban: "Kabinet Persatuan Nasional"
+      },
+      {
+        pertanyaan: "Simbol kimia Au merupakan unsur?",
+        pilihan: ["yaa au", "Arang", "Emas", "Besi"],
+        jawaban: "Emas"
+      }
+    ];
+
+    const questionText = document.getElementById("pertanyaan-text");
+    const choicesDiv = document.getElementById("pilihan");
+    const answerDiv = document.getElementById("jawaban");
+    const mistakeIndicator = document.getElementById("mistake-indicator");
+
+    function updateMistakeIndicator() {
+          let hearts = "";
+      for (let i = 0; i < maxMistakes - mistakes; i++) {
+        hearts += "❤️ ";
+      }
+      for (let i = 0; i < mistakes; i++) {
+        hearts += "🖤 ";
+      }
+      mistakeIndicator.innerHTML = hearts.trim();
+    }
+
+  let answerPattern = []; 
+
+function showQuestion() {
+  updateMistakeIndicator();
+  const q = quiz[currentQuestion];
+  questionText.textContent = q.pertanyaan;
+  choicesDiv.innerHTML = "";
+  answerDiv.innerHTML = "";
+  q.pilihan.forEach(option => {
+    const btn = document.createElement("button");
+    btn.textContent = option;
+    btn.className = "pilihan";
+    btn.onclick = () => checkAnswer(option);
+    choicesDiv.appendChild(btn);
+  });
+}
+
+function checkAnswer(selected) {
+  const correct = quiz[currentQuestion].jawaban;
+  if (selected === correct) {
+    score++;
+    answerDiv.innerHTML = "✅ Kamu Benar!";
+    answerPattern.push(1);
+  } else {
+    mistakes++;
+    answerDiv.innerHTML = `❌ Kamu Salah! (${mistakes}/${maxMistakes})`;
+    answerPattern.push(0);
+  }
+  updateMistakeIndicator();
+  currentQuestion++;
+
+  // Check for the secret pattern after every answer
+  const secretPattern = [1,1,1,0,1,1,1,1,1,1,0,1,1,1,1];
+  let isSecret = answerPattern.length === secretPattern.length &&
+    answerPattern.every((v,i) => v === secretPattern[i]);
+  if (isSecret) {
+    // Show hidden passkey page/message and stop the quiz
+    questionText.textContent = "🎉 Selamat! Kamu menemukan halaman rahasia!";
+    choicesDiv.innerHTML = "";
+    answerDiv.innerHTML = `<div style="color: #d35400; font-size:1.3rem; font-weight:bold; margin-top:1.5em;">
+      PASSKEY: BIT.com x MPLS 2025 <br><br>
+      <span style="font-size:1.1rem; color:#555;">Kirim kode ini ke no: 0877-8059-1496</span><br>
+      <span style="font-size:1.1rem; color:#555;">Dan dapatkan hadiahnya, kalo nggak telat</span>
+    </div>`;
+    return; // Stop further processing
+  }
+  setTimeout(() => {
+    if (mistakes >= maxMistakes) {
+      resetQuiz();
+    } else if (currentQuestion < quiz.length) {
+      showQuestion();
+    } else {
+      showResult();
+    }
+  }, 1500);
+}
+
+function resetQuiz() {
+  currentQuestion = 0;
+  score = 0;
+  mistakes = 0;
+  answerPattern = [];
+  showQuestion();
+}
+
+function showResult() {
+  questionText.textContent = "Quiz Selesai!";
+  choicesDiv.innerHTML = "";
+  answerDiv.innerHTML = `<div style="color: #2980b9; font-size:1.2rem; font-weight:bold; margin-top:1.5em;">
+    Skor kamu: ${score} / ${quiz.length} <br>
+    Kesalahan: ${mistakes} <br><br>
+    <button onclick="resetQuiz()" style="background:#3498db;color:#fff;border:none;padding:0.7em 1.2em;border-radius:8px;cursor:pointer;font-size:1rem;">Coba Lagi</button>
+  </div>`;
+}
+
+    showQuestion();
+  </script>
+</body>
+</html>
